@@ -1,4 +1,4 @@
 export type TaskListAction =
-| { type: 'ADD' }
-| { type: 'TOGGLE' }
-| { type: 'DELETE' };
+| { type: 'ADD', text: string }
+| { type: 'TOGGLE', id: number }
+| { type: 'DELETE', id: number };
