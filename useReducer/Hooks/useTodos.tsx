@@ -1,31 +1,38 @@
 import { View, Text, FlatList, TouchableOpacity, TextInput, StyleSheet } from 'react-native'
-import React, { act, useReducer, useState } from 'react'
+import React, { useReducer, useState } from 'react'
 import { Task } from '../types/Task';
 import { TaskListAction } from '../types/TaskListAction';
 import Row from '../components/Row';
 
-const [inputText, setInputText] = useState<string>('')
 
-const todoReducer = (state: Task[], action: TaskListAction) => {
+
+const todoReducer = (state: Task[], action: TaskListAction):Task[] => {
     switch (action.type) {
         case 'ADD':
             return [...state, {text: action.text, done: 0, id: state.length + 1}]
         case 'TOGGLE':
-            return state.map((task, id) =>
-                id === action.id ? { ...task, done: !task.done } : task
-            );
+            return state.map(task => {
+                if (task.id === action.id) {
+                    return { ...task, done: task.done == 0 ? 1 : 0};
+                } else {
+                    return task;
+                }
+            });
         case 'DELETE':
             return state.filter(task => task.id !== action.id);
         default:
             Error();
+            return state
     }
 };
 
-export default function useTodos() {
+export default function UseTodos() {
+    const [inputText, setInputText] = useState<string>('')
     const [tasks, dispatch] = useReducer(todoReducer, [])
   
     const addTask = (text : string) => {
         dispatch({ type: 'ADD', text: text});
+        setInputText('')
     }
 
     const toggleTask = (id: number) => {
@@ -44,7 +51,7 @@ export default function useTodos() {
                     placeholder="Enter task..."
                     value={inputText}
                     onChangeText={setInputText}
-                    onSubmitEditing={addTask}
+                    onSubmitEditing={async () => addTask}
                 />
                 <TouchableOpacity onPress={async () => addTask(inputText)} style={styles.addButton}>
                     <Text>Add</Text>
